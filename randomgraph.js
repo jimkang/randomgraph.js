@@ -1,8 +1,13 @@
-(function() {
+function RandomGraph(createOpts) {
+    var random;
+    if (createOpts) {
+        random = createOpts.random;
+    }
 
-    /**
-     * @namespace randomgraph
-     */
+    if (!random) {
+        random = Math.random;
+    }
+
     var randomgraph = {
 
         /**
@@ -57,7 +62,7 @@
                 for (i = 0; i < n; i++) {
                     graph.nodes.push({ label: 'node '+i });
                     for (j = 0; j < i; j++) {
-                        if (Math.random() < p) {
+                        if (random() < p) {
                             graph.edges.push({
                                 source: i,
                                 target: j
@@ -88,7 +93,7 @@
                 // pick m random edges from tmpEdges
                 k = tmpEdges.length - 1;
                 for (i = 0; i < M; i++) {
-                    graph.edges.push(tmpEdges.splice(Math.floor(Math.random()*k), 1)[0]);
+                    graph.edges.push(tmpEdges.splice(Math.floor(random()*k), 1)[0]);
                     k--;
                 }
                 return graph;
@@ -133,14 +138,14 @@
                         ids.push(i);
                     }
                     while (ec < nk_half && ids.length > 0) {
-                        i = ids.splice(Math.floor(Math.random()*ids.length), 1)[0];
+                        i = ids.splice(Math.floor(random()*ids.length), 1)[0];
                         Rij = [];
                         sumRij = 0;
                         for (j = 0; j < n; j++) {
                             Rij[j] = calculateRij(i, j);
                             sumRij += Rij[j];
                         }
-                        r = Math.random();
+                        r = random();
                         pij = 0;
                         for (j = 0; j < n; j++) {
                             if (i != j) {
@@ -202,9 +207,9 @@
                 // rewiring of edges
                 for (i = 0; i < n; i++) {
                     for (j = 1; j <= K; j++) { // for every pair of nodes
-                        if (Math.random() <= beta) {
+                        if (random() <= beta) {
                             do {
-                                t = Math.floor(Math.random() * (n-1));
+                                t = Math.floor(random() * (n-1));
                             } while (t == i || edge_lut[i+'-'+t]);
                             var j_ = (i+j)%n;
                             edge_lut[i+'-'+j_].target = t; // rewire
@@ -253,7 +258,7 @@
                 for (j = 0; j < i; j++) sum += degrees[j];
                 s = 0;
                 for (m = 0; m < M; m++) {
-                    r = Math.random();
+                    r = random();
                     p = 0;
                     for (j = 0; j < i; j++) {
                         if (edge_lut[i+'-'+j] || edge_lut[j+'-'+i]) continue;
@@ -276,24 +281,7 @@
         }
     };
 
-    // CommonJS module is defined
-    if (typeof module !== 'undefined' && module.exports) {
-        module.exports = randomgraph;
-    }
+    return randomgraph;
+}
 
-    /*global ender:false */
-    if (typeof ender === 'undefined') {
-        // here, `this` means `window` in the browser, or `global` on the server
-        // add `numeral` as a global object via a string identifier,
-        // for Closure Compiler 'advanced' mode
-        this['randomgraph'] = randomgraph;
-    }
-
-    /*global define:false */
-    if (typeof define === 'function' && define.amd) {
-        define([], function () {
-            return randomgraph;
-        });
-    }
-
-})();
+module.exports = RandomGraph;
